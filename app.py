@@ -1,17 +1,15 @@
 import streamlit as st
 import pandas as pd
-import plotly.express as px
+import matplotlib.pyplot as plt
 
-# Заглушка данных: фиктивные данные
+# Функция для генерации данных (вместо реального API или запроса)
 def get_candidates_by_skill_and_country(skills, countries):
-    # Генерация фиктивных данных для тестирования
+    # Создаем фиктивные данные
     data = []
     for skill in skills:
         for country in countries:
-            num_candidates = len(skill) * len(country) * 5  # Пример формулы подсчёта
-            data.append(
-                {"Skill": skill, "Country": country, "Candidates": num_candidates}
-            )
+            num_candidates = len(skill) * len(country) * 5  # Пример подсчёта
+            data.append({"Skill": skill, "Country": country, "Candidates": num_candidates})
     return pd.DataFrame(data)
 
 # Заголовок приложения
@@ -32,19 +30,17 @@ if st.button("Анализировать"):
         df = get_candidates_by_skill_and_country(skill_list, country_list)
 
         # Отображение таблицы с результатами
-        st.subheader("Результаты:")
+        st.subheader("Результаты анализа:")
         st.dataframe(df)
 
-        # Построение графиков
-        fig = px.bar(
-            df,
-            x="Country",
-            y="Candidates",
-            color="Skill",
-            barmode="group",
-            title="Количество кандидатов по странам и навыкам",
-        )
-        st.plotly_chart(fig)
+        # Визуализация с помощью Matplotlib
+        fig, ax = plt.subplots()
+        df_grouped = df.groupby("Country")["Candidates"].sum()
+        df_grouped.plot(kind="bar", ax=ax)
+        ax.set_title("Количество кандидатов по странам (в сумме для всех навыков)")
+        ax.set_ylabel("Кандидатов")
+        ax.set_xlabel("Страны")
+        st.pyplot(fig)
 
     else:
-        st.error("Пожалуйста, введите и навыки, и страны!")
+        st.error("Пожалуйста, укажите навыки и страны!")
