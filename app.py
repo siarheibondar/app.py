@@ -1,10 +1,8 @@
 import streamlit as st
 import pandas as pd
-import matplotlib.pyplot as plt
 
-# Функция для генерации данных (вместо реального API или запроса)
+# Функция для генерации данных (фиктивные данные)
 def get_candidates_by_skill_and_country(skills, countries):
-    # Создаем фиктивные данные
     data = []
     for skill in skills:
         for country in countries:
@@ -15,32 +13,28 @@ def get_candidates_by_skill_and_country(skills, countries):
 # Заголовок приложения
 st.title("Анализ кандидатов по навыкам и странам")
 
-# Ввод данных от пользователя
+# Ввод от пользователя
 skills = st.text_input("Введите навыки через запятую (например, OFSC, Salesforce, AWS):")
 countries = st.text_input("Введите страны через запятую (например, USA, India, Germany):")
 
-# Кнопка для анализа данных
+# Кнопка для запуска анализа
 if st.button("Анализировать"):
-    if skills and countries:
-        # Форматирование данных ввода
+    if skills and countries:  # Проверяем, что оба поля заполнены
+        # Обрабатываем ввод
         skill_list = [skill.strip() for skill in skills.split(",")]
         country_list = [country.strip() for country in countries.split(",")]
 
-        # Получение данных
+        # Получаем данные
         df = get_candidates_by_skill_and_country(skill_list, country_list)
 
-        # Отображение таблицы с результатами
+        # Отображаем таблицу результатов
         st.subheader("Результаты анализа:")
         st.dataframe(df)
 
-        # Визуализация с помощью Matplotlib
-        fig, ax = plt.subplots()
-        df_grouped = df.groupby("Country")["Candidates"].sum()
-        df_grouped.plot(kind="bar", ax=ax)
-        ax.set_title("Количество кандидатов по странам (в сумме для всех навыков)")
-        ax.set_ylabel("Кандидатов")
-        ax.set_xlabel("Страны")
-        st.pyplot(fig)
+        # Показываем сводку по странам
+        st.subheader("Сводка по странам:")
+        country_summary = df.groupby("Country")["Candidates"].sum().reset_index()
+        st.table(country_summary)
 
     else:
-        st.error("Пожалуйста, укажите навыки и страны!")
+        st.error("Пожалуйста, заполните оба поля: навыки и страны!")
